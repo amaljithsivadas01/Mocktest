@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mock Exam | Page Learning</title>
+  <meta name="description" content="Online Mock Test - Page Learning Custom Exam Portal" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="logo.png" />
+</head>
+<body>
+
+  <!-- Decorative Background Accents -->
+  <div class="deco-circle deco-top-left"></div>
+  <div class="deco-circle deco-mid-right"></div>
+  <div class="deco-circle deco-bottom-left"></div>
+
+  <!-- STICKY NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-brand">
+      <img src="logo.png" alt="Page Learning" />
+    </a>
+    <a
+      href="https://wa.me/917736164363"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="whatsapp-btn"
+      id="whatsapp-btn-exam"
+    >
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      <span>WhatsApp Us</span>
+    </a>
+  </nav>
+
+  <!-- STICKY 30-MINUTE TIMER BAR (Directly below sticky navbar) -->
+  <aside class="sticky-timer-bar" id="sticky-timer-bar" aria-label="Exam Timer">
+    <div class="timer-content">
+      <span id="timer-status-label">Time Remaining:</span>
+      <div class="timer-badge" id="timer-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span id="timer-display">30:00</span>
+      </div>
+      <div class="timer-progress-track">
+        <div class="timer-progress-bar" id="timer-progress-bar"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="main-wrapper has-timer">
+    <div style="width: 100%; max-width: 490px; margin: 0 auto 12px;">
+      <a href="index.html" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Active Exams
+      </a>
+    </div>
+
+    <!-- Exam Card -->
+    <div class="exam-card">
+      
+      <!-- Illustrated Header -->
+      <div class="card-header-art">
+        <svg class="scene" viewBox="0 0 520 145" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="skyGradExam" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7c73d8"/>
+              <stop offset="100%" stop-color="#9d96e8"/>
+            </linearGradient>
+          </defs>
+          <rect width="520" height="145" fill="url(#skyGradExam)"/>
+          <!-- Birds -->
+          <path d="M80 30 Q85 25 90 30 Q95 25 100 30" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" fill="none"/>
+          <path d="M300 20 Q304 16 308 20 Q312 16 316 20" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" fill="none"/>
+          <path d="M400 38 Q403 34 406 38 Q409 34 412 38" stroke="rgba(255,255,255,0.4)" stroke-width="1.3" fill="none"/>
+          <!-- Rolling Hills -->
+          <ellipse cx="260" cy="165" rx="280" ry="80" fill="rgba(255,255,255,0.12)"/>
+          <ellipse cx="80" cy="155" rx="140" ry="60" fill="rgba(255,255,255,0.1)"/>
+          <ellipse cx="440" cy="160" rx="130" ry="55" fill="rgba(255,255,255,0.1)"/>
+          <ellipse cx="130" cy="150" rx="180" ry="55" fill="rgba(255,255,255,0.18)"/>
+          <ellipse cx="400" cy="153" rx="170" ry="50" fill="rgba(255,255,255,0.15)"/>
+          <!-- Left Palm Detail -->
+          <rect x="54" y="68" width="4" height="60" rx="2" fill="rgba(255,255,255,0.55)"/>
+          <ellipse cx="56" cy="68" rx="22" ry="8" fill="rgba(255,255,255,0.4)" transform="rotate(-35,56,68)"/>
+          <ellipse cx="56" cy="66" rx="22" ry="8" fill="rgba(255,255,255,0.35)" transform="rotate(20,56,66)"/>
+          <ellipse cx="56" cy="62" rx="18" ry="7" fill="rgba(255,255,255,0.3)" transform="rotate(-65,56,62)"/>
+          <!-- Right Palm Detail -->
+          <rect x="460" y="70" width="4" height="58" rx="2" fill="rgba(255,255,255,0.55)"/>
+          <ellipse cx="462" cy="70" rx="22" ry="8" fill="rgba(255,255,255,0.4)" transform="rotate(35,462,70)"/>
+          <ellipse cx="462" cy="68" rx="22" ry="8" fill="rgba(255,255,255,0.35)" transform="rotate(-20,462,68)"/>
+          <ellipse cx="462" cy="64" rx="18" ry="7" fill="rgba(255,255,255,0.3)" transform="rotate(65,462,64)"/>
+        </svg>
+      </div>
+
+      <!-- Badge Anchor -->
+      <div class="badge-anchor">
+        <div class="header-pill-badge" id="exam-badge">
+          Loading Exam...
+        </div>
+      </div>
+
+      <!-- Card Body -->
+      <form class="card-body" id="exam-form">
+
+        <!-- Student Full Name Field -->
+        <div class="form-field-group">
+          <label class="field-label" for="student-name">FULL NAME *</label>
+          <input
+            type="text"
+            id="student-name"
+            class="field-input"
+            placeholder="e.g. Avin Byju"
+            required
+            autocomplete="name"
+          />
+        </div>
+
+        <!-- Optional Stream/Batch Container (if present in Google Form) -->
+        <div class="form-field-group" id="batch-field-container" style="display: none;">
+          <label class="field-label" for="batch-input">BATCH / STREAM</label>
+          <select id="batch-input" class="field-select">
+            <option value="COMMERCE">COMMERCE</option>
+          </select>
+        </div>
+
+        <!-- Real-time Fetched Questions Container -->
+        <div class="questions-list" id="questions-container">
+          <!-- Dynamic MCQs rendered here -->
+          <div style="text-align: center; padding: 40px 10px; color: #64748b;">
+            <div class="skeleton-shimmer" style="height: 24px; border-radius: 6px; margin-bottom: 12px;"></div>
+            <div class="skeleton-shimmer" style="height: 50px; border-radius: 12px; margin-bottom: 8px;"></div>
+            <div class="skeleton-shimmer" style="height: 50px; border-radius: 12px; margin-bottom: 8px;"></div>
+            <p style="margin-top: 14px; font-size: 0.9rem; font-weight: 500;">Loading live exam questions from Google Forms...</p>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-exam-btn" id="submit-exam-btn">
+          <span>Submit Exam</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+
+      </form>
+    </div>
+  </main>
+
+  <!-- RESULT MODAL -->
+  <div class="modal-overlay" id="result-modal">
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-score-circle">
+          <span class="score-num" id="modal-score-num">--</span>
+          <span class="score-max">/ 100</span>
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 4px;">Exam Completed!</h2>
+        <p style="font-size: 0.85rem; opacity: 0.9;" id="modal-dept-label">Page Learning Mock Test</p>
+      </div>
+      <div class="result-body">
+        <div class="result-row">
+          <span class="result-label">Candidate Name</span>
+          <span class="result-value" id="modal-student-name">--</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Correct Answers</span>
+          <span class="result-value" id="modal-correct-count">--</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Percentage</span>
+          <span class="result-value" id="modal-percentage">--</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Time Taken</span>
+          <span class="result-value" id="modal-time-taken">--</span>
+        </div>
+        <div class="result-row" style="border-bottom: none;">
+          <span class="result-label">Status</span>
+          <span class="result-value" style="color: #10b981;">Submitted & Recorded</span>
+        </div>
+        <a href="index.html" class="submit-exam-btn" style="text-decoration: none; margin-top: 8px;">
+          Done & Return to Exams
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    © 2026 Page Learning. All rights reserved.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

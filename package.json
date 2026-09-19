@@ -1,0 +1,17 @@
+{
+  "name": "page-learning-exams",
+  "version": "1.0.0",
+  "description": "Custom UI Google Forms Exam Portal for Page Learning",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "devDependencies": {
+    "dotenv": "^16.6.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "exam-notification-bot",
+  "version": "1.0.0",
+  "description": "Page Learning Real-time Exam Results Telegram Bot",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18.x"
+  }
+}
