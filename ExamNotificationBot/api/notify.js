@@ -6,13 +6,50 @@
    ==================================================================== */
 
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL;
-const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const SUBSCRIBE_PASSWORD = process.env.SUBSCRIBE_PASSWORD || "2012";
 
-// Local in-memory set as fallback if Redis credentials are not yet configured
+// Storage Option 1: Supabase (PostgreSQL REST API)
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Storage Option 2: Upstash Redis (HTTP REST API)
+const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL;
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+// Storage Option 3: Local in-memory set as fallback
 const localSubscribers = new Set();
 const localStates = new Map();
+
+// ===== SUPABASE REST HELPER =====
+async function supabase(endpoint, options = {}) {
+  if (!SUPABASE_URL || !SUPABASE_KEY) return null;
+  const baseUrl = SUPABASE_URL.replace(/\/+$/, '');
+  const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+  try {
+    const res = await fetch(`${baseUrl}/rest/v1/${endpoint}`, {
+      ...options,
+      headers
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('Supabase REST error:', res.status, errText);
+      return null;
+    }
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return await res.json();
+    }
+    return true;
+  } catch (err) {
+    console.error('Supabase connection error:', err.message);
+    return null;
+  }
+}
 
 // ===== UPSTASH REDIS HELPERS (HTTP REST API) =====
 async function redis(command, ...args) {
@@ -32,20 +69,40 @@ async function redis(command, ...args) {
   }
 }
 
-// Subscriber set helpers
+// ===== SUBSCRIBER OPERATIONS (Supports Supabase, Upstash, or In-Memory) =====
 async function addSubscriber(chatId) {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    const res = await supabase('subscribers', {
+      method: 'POST',
+      headers: { 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ chat_id: String(chatId) })
+    });
+    if (res !== null) return true;
+  }
   const res = await redis('sadd', 'exam_subscribers', String(chatId));
   if (res === null) localSubscribers.add(String(chatId));
   return res;
 }
 
 async function removeSubscriber(chatId) {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    const res = await supabase(`subscribers?chat_id=eq.${encodeURIComponent(chatId)}`, {
+      method: 'DELETE'
+    });
+    if (res !== null) return true;
+  }
   const res = await redis('srem', 'exam_subscribers', String(chatId));
   if (res === null) localSubscribers.delete(String(chatId));
   return res;
 }
 
 async function getAllSubscribers() {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    const rows = await supabase('subscribers?select=chat_id');
+    if (Array.isArray(rows)) {
+      return rows.map(r => String(r.chat_id));
+    }
+  }
   const result = await redis('smembers', 'exam_subscribers');
   if (Array.isArray(result) && result.length > 0) {
     return result;
@@ -54,28 +111,49 @@ async function getAllSubscribers() {
 }
 
 async function isSubscribed(chatId) {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    const rows = await supabase(`subscribers?chat_id=eq.${encodeURIComponent(chatId)}&select=chat_id`);
+    if (Array.isArray(rows)) return rows.length > 0;
+  }
   const result = await redis('sismember', 'exam_subscribers', String(chatId));
   if (result !== null) return result === 1;
   return localSubscribers.has(String(chatId));
 }
 
-// State helpers (5-minute TTL - auto-expires)
+// ===== STATE OPERATIONS (5-minute TTL) =====
 async function setState(chatId, state) {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    await supabase('bot_states', {
+      method: 'POST',
+      headers: { 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ chat_id: String(chatId), state })
+    });
+    return;
+  }
   const res = await redis('set', `state:${chatId}`, state, 'ex', '300');
   if (res === null) localStates.set(String(chatId), state);
-  return res;
 }
 
 async function getState(chatId) {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    const rows = await supabase(`bot_states?chat_id=eq.${encodeURIComponent(chatId)}&select=state`);
+    if (Array.isArray(rows) && rows.length > 0) return rows[0].state;
+    return null;
+  }
   const res = await redis('get', `state:${chatId}`);
   if (res !== null) return res;
   return localStates.get(String(chatId)) || null;
 }
 
 async function clearState(chatId) {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    await supabase(`bot_states?chat_id=eq.${encodeURIComponent(chatId)}`, {
+      method: 'DELETE'
+    });
+    return;
+  }
   const res = await redis('del', `state:${chatId}`);
   if (res === null) localStates.delete(String(chatId));
-  return res;
 }
 
 // ===== TELEGRAM SEND MESSAGE HELPER =====
