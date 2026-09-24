@@ -28,19 +28,19 @@ var BOT_WEBHOOK_URL = "https://exam-notification-bot.vercel.app/api/notify";
 // Entry IDs configuration for all 3 departments (hidden securely on Google Apps Script)
 var FORMS_CONFIG = {
   science: {
-    title: "CUET UG CHEMISTRY 1",
+    title: "CUET UG PHYSICS 1",
     department: "Department of Science",
     actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLScx0EcpmwWnuPwVWEa5g22_vlekBUu8q3_WZRFRGFOni_da-Q/formResponse",
     nameEntry: "entry.271341288"
   },
   humanities: {
-    title: "CUET UG HISTORY 1",
+    title: "CUET UG POLITICAL SCIENCE 1",
     department: "Department of Humanities",
     actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfSsPceCoZt-K91EmTwDaPmZwQYVSmUAIg0zH6HAOzy4IAUhg/formResponse",
     nameEntry: "entry.836112701"
   },
   commerce: {
-    title: "CUET UG BUSINESS STUDIES 1",
+    title: "CUET UG ACCOUNTANCY 1",
     department: "Department of Commerce",
     actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSeOEdoTYgQe0qZd8C6Ojs8ViRct-klN3ft5jpuHlVO-te0cAw/formResponse",
     nameEntry: "entry.582359518",
@@ -72,12 +72,17 @@ function onFormSubmit(e) {
         }
       }
 
-      // Quiz Score
-      if (typeof e.response.getScore === 'function') {
-        var score = e.response.getScore();
-        if (score !== null && score !== undefined) {
-          marks = score;
+      // Quiz Score in Google Forms
+      if (typeof e.response.getGradableItemResponses === 'function') {
+        var gradableItems = e.response.getGradableItemResponses();
+        var totalScore = 0;
+        for (var g = 0; g < gradableItems.length; g++) {
+          var itemScore = gradableItems[g].getScore();
+          if (itemScore !== null && itemScore !== undefined) {
+            totalScore += itemScore;
+          }
         }
+        marks = totalScore;
       }
       
       // Determine form title
@@ -91,10 +96,10 @@ function onFormSubmit(e) {
     if (e && e.namedValues) {
       for (var key in e.namedValues) {
         var lowerKey = key.toLowerCase();
-        if (lowerKey.indexOf("name") !== -1) {
+        if (lowerKey.indexOf("name") !== -1 || lowerKey.indexOf("student") !== -1) {
           studentName = e.namedValues[key][0];
         }
-        if (lowerKey.indexOf("score") !== -1) {
+        if (lowerKey.indexOf("score") !== -1 || lowerKey.indexOf("mark") !== -1) {
           var rawScore = e.namedValues[key][0];
           var parts = rawScore.split("/");
           marks = parseFloat(parts[0].trim());
@@ -107,6 +112,16 @@ function onFormSubmit(e) {
       if (sheet) {
         examTitle = sheet.getName();
       }
+    }
+
+    // Department auto-detection from title
+    var lowerTitle = examTitle.toLowerCase();
+    if (lowerTitle.indexOf("physics") !== -1 || lowerTitle.indexOf("chemistry") !== -1 || lowerTitle.indexOf("science") !== -1) {
+      department = "Department of Science";
+    } else if (lowerTitle.indexOf("political") !== -1 || lowerTitle.indexOf("history") !== -1 || lowerTitle.indexOf("humanities") !== -1) {
+      department = "Department of Humanities";
+    } else if (lowerTitle.indexOf("accountancy") !== -1 || lowerTitle.indexOf("business") !== -1 || lowerTitle.indexOf("commerce") !== -1) {
+      department = "Department of Commerce";
     }
 
     var percentage = Math.round((marks / maxMarks) * 100);

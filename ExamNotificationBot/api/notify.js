@@ -19,6 +19,7 @@ const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 // Storage Option 3: Local in-memory set as fallback
 const localSubscribers = new Set();
 const localStates = new Map();
+const localSubmissions = [];
 
 // ===== SUPABASE REST HELPER =====
 async function supabase(endpoint, options = {}) {
@@ -156,6 +157,71 @@ async function clearState(chatId) {
   if (res === null) localStates.delete(String(chatId));
 }
 
+// ===== EXAM SUBMISSIONS & MARKS STORAGE =====
+async function storeSubmission(sub) {
+  const timestamp = new Date().toISOString();
+  const marks = Number(sub.marks !== undefined ? sub.marks : (sub.score !== undefined ? sub.score : 0));
+  const maxMarks = Number(sub.maxMarks || 100);
+  const percentage = Number(sub.percentage !== undefined ? sub.percentage : Math.round((marks / maxMarks) * 100));
+
+  const record = {
+    student_name: sub.studentName || sub.name || sub.fullname || 'Student',
+    marks: marks,
+    max_marks: maxMarks,
+    percentage: percentage,
+    department: sub.department || 'General',
+    exam_title: sub.examTitle || 'CUET Mock Test',
+    duration_seconds: Number(sub.durationSeconds || 0),
+    submitted_at: timestamp
+  };
+
+  // Option 1: Supabase
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    try {
+      await supabase('exam_submissions', {
+        method: 'POST',
+        body: JSON.stringify(record)
+      });
+    } catch (err) {
+      console.error('Failed to store submission in Supabase:', err.message);
+    }
+  }
+
+  // Option 2: Upstash Redis (store in list and keep latest 200)
+  if (UPSTASH_URL && UPSTASH_TOKEN && !UPSTASH_URL.includes('your-database')) {
+    try {
+      await redis('lpush', 'exam_submissions', JSON.stringify(record));
+      await redis('ltrim', 'exam_submissions', '0', '199');
+    } catch (err) {
+      console.error('Failed to store submission in Redis:', err.message);
+    }
+  }
+
+  // Option 3: Local in-memory fallback
+  localSubmissions.unshift(record);
+  if (localSubmissions.length > 200) localSubmissions.pop();
+
+  return record;
+}
+
+async function getRecentSubmissions(limit = 10) {
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    const rows = await supabase(`exam_submissions?order=submitted_at.desc&limit=${limit}`);
+    if (Array.isArray(rows) && rows.length > 0) return rows;
+  }
+
+  if (UPSTASH_URL && UPSTASH_TOKEN && !UPSTASH_URL.includes('your-database')) {
+    const raw = await redis('lrange', 'exam_submissions', '0', String(limit - 1));
+    if (Array.isArray(raw) && raw.length > 0) {
+      return raw.map(item => {
+        try { return typeof item === 'string' ? JSON.parse(item) : item; } catch(e) { return item; }
+      });
+    }
+  }
+
+  return localSubmissions.slice(0, limit);
+}
+
 // ===== TELEGRAM SEND MESSAGE HELPER =====
 async function sendMessage(chatId, htmlText) {
   if (!BOT_TOKEN) {
@@ -236,7 +302,7 @@ async function handleTelegramUpdate(update) {
       await clearState(chatId);
       await sendMessage(
         chatId,
-        `✅ <b>Subscribed successfully!</b>\n\nYou will now receive real-time notifications with student names and final marks when an exam is submitted.\n\n📋 Commands:\n/unsubscribe — Stop notifications\n/status — View subscriber count`
+        `✅ <b>Subscribed successfully!</b>\n\nYou will now receive real-time notifications with student names and final marks when an exam is submitted.\n\n📋 Commands:\n/scores — View recent student marks\n/status — View subscriber count\n/unsubscribe — Stop notifications`
       );
       return;
     } else if (args !== '') {
@@ -276,8 +342,44 @@ async function handleTelegramUpdate(update) {
     const subscribers = await getAllSubscribers();
     await sendMessage(
       chatId,
-      `📊 <b>Bot Status</b>\n\n👥 Total active subscribers: <b>${subscribers.length}</b>`
+      `📊 <b>Bot Status</b>\n\n👥 Total active subscribers: <b>${subscribers.length}</b>\n\n📋 Commands:\n/scores — View recent exam submissions\n/status — View subscriber count\n/unsubscribe — Stop notifications`
     );
+    return;
+  }
+
+  // /scores or /results command
+  if (command === '/scores' || command === '/results') {
+    const subscribed = await isSubscribed(chatId);
+    if (!subscribed) {
+      await sendMessage(chatId, `🔒 Please subscribe with /start and password first to view exam results.`);
+      return;
+    }
+
+    const recents = await getRecentSubmissions(10);
+    if (!recents || recents.length === 0) {
+      await sendMessage(chatId, `📋 <b>No exam submissions recorded yet.</b>`);
+      return;
+    }
+
+    let report = `📊 <b>Recent Exam Submissions (${recents.length}):</b>\n\n`;
+    recents.forEach((item, idx) => {
+      const name = item.student_name || item.studentName || item.fullname || 'Student';
+      const marks = item.marks !== undefined ? item.marks : (item.score !== undefined ? item.score : '--');
+      const maxMarks = item.max_marks || item.maxMarks || 100;
+      const pct = item.percentage !== undefined ? item.percentage : Math.round((marks / maxMarks) * 100);
+      const title = item.exam_title || item.examTitle || 'Exam';
+      const dateStr = item.submitted_at ? new Date(item.submitted_at).toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true
+      }) : '';
+
+      report += `${idx + 1}. <b>${escapeHtml(name)}</b> — <b>${marks} / ${maxMarks}</b> (${pct}%)\n`;
+      report += `   📚 ${escapeHtml(title)}\n`;
+      if (dateStr) report += `   🕒 ${dateStr}\n`;
+      report += `\n`;
+    });
+
+    await sendMessage(chatId, report.trim());
     return;
   }
 
@@ -289,7 +391,7 @@ async function handleTelegramUpdate(update) {
       await clearState(chatId);
       await sendMessage(
         chatId,
-        `✅ <b>Subscribed successfully!</b>\n\nYou will now receive real-time notifications with student names and final marks when an exam is submitted.\n\n📋 Commands:\n/unsubscribe — Stop notifications\n/status — View subscriber count`
+        `✅ <b>Subscribed successfully!</b>\n\nYou will now receive real-time notifications with student names and final marks when an exam is submitted.\n\n📋 Commands:\n/scores — View recent student marks\n/status — View subscriber count\n/unsubscribe — Stop notifications`
       );
     } else {
       await sendMessage(
@@ -333,10 +435,13 @@ export default async function handler(req, res) {
 
     // PATH 2: Exam Notification from Web Portal or Google Apps Script
     if (body.studentName !== undefined || body.marks !== undefined || body.fullname !== undefined || body.score !== undefined) {
+      // 1. Permanently store the submission & marks
+      await storeSubmission(body);
+
       const subscribers = await getAllSubscribers();
 
       if (subscribers.length === 0) {
-        return res.status(200).json({ ok: true, message: 'No subscribers registered yet' });
+        return res.status(200).json({ ok: true, stored: true, message: 'Submission stored. No subscribers registered yet.' });
       }
 
       const message = formatExamNotification(body);
@@ -348,6 +453,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         ok: true,
+        stored: true,
         notified: subscribers.length,
         results: results.map(r => r.status === 'fulfilled' ? r.value : { error: r.reason })
       });
