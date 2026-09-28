@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {};
-    const { studentName, dept, answers = {}, durationSeconds = 0, batch } = body;
+    const { studentName, dept, answers = {}, durationSeconds = 0, batch, school, medium } = body;
 
     if (!studentName || !studentName.trim()) {
       return res.status(400).json({ ok: false, error: 'Student name is required' });
@@ -36,6 +36,12 @@ export default async function handler(req, res) {
       formPayload[`entry.${examData.batchEntryId}`] = batch;
     } else if (examData.batchEntryId && dept === 'commerce') {
       formPayload[`entry.${examData.batchEntryId}`] = 'COMMERCE';
+    }
+    if (examData.schoolEntryId) {
+      formPayload[`entry.${examData.schoolEntryId}`] = (school && school.trim()) || 'GHSS THRISSUR';
+    }
+    if (examData.mediumEntryId) {
+      formPayload[`entry.${examData.mediumEntryId}`] = medium || 'ENGLISH';
     }
 
     for (const [entryId, answer] of Object.entries(answers)) {

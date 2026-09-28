@@ -49,6 +49,18 @@ async function loadExamQuestions(dept) {
       batchContainer.style.display = 'flex';
     }
 
+    // Check School Field
+    const schoolContainer = document.getElementById('school-field-container');
+    if (schoolContainer && examData.schoolEntryId) {
+      schoolContainer.style.display = 'flex';
+    }
+
+    // Check Medium Field
+    const mediumContainer = document.getElementById('medium-field-container');
+    if (mediumContainer && examData.mediumEntryId) {
+      mediumContainer.style.display = 'flex';
+    }
+
     // Render Questions
     renderQuestions(examData.questions);
 
@@ -87,7 +99,7 @@ function renderQuestions(questions) {
       <div class="question-block" data-entry-id="${entryId}" id="q-block-${index}">
         <div class="question-header">
           <span class="q-badge">Q${qNum}</span>
-          <div class="question-text">${escapeHtml(q.title)}</div>
+          <div class="question-text">${formatQuestionText(q.title)}</div>
         </div>
         <div class="options-group">
     `;
@@ -103,7 +115,7 @@ function renderQuestions(questions) {
             value="${escapeHtml(optionText)}"
             required
           />
-          <span class="option-text">${escapeHtml(optionText)}</span>
+          <span class="option-text">${formatOptionText(optionText)}</span>
         </label>
       `;
     });
@@ -255,6 +267,12 @@ async function handleFormSubmit(e) {
   const batchInput = document.getElementById('batch-input');
   const batch = batchInput ? batchInput.value : '';
 
+  const schoolInput = document.getElementById('school-input');
+  const school = schoolInput ? schoolInput.value.trim() : '';
+
+  const mediumInput = document.getElementById('medium-input');
+  const medium = mediumInput ? mediumInput.value : '';
+
   try {
     const res = await fetch('/api/submit', {
       method: 'POST',
@@ -264,7 +282,9 @@ async function handleFormSubmit(e) {
         dept: examData.dept,
         answers,
         durationSeconds,
-        batch
+        batch,
+        school,
+        medium
       })
     });
 
@@ -331,4 +351,28 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+// Utility: Format question text with Malayalam detection and line breaks
+function formatQuestionText(text) {
+  if (!text) return '';
+  const lines = String(text).split('\n');
+  const formatted = lines.map(line => {
+    const escaped = escapeHtml(line);
+    if (/[\u0D00-\u0D7F]/.test(line)) {
+      return `<span class="malayalam-text">${escaped}</span>`;
+    }
+    return escaped;
+  });
+  return formatted.join('<br/>');
+}
+
+// Utility: Format option text with Malayalam detection
+function formatOptionText(text) {
+  if (!text) return '';
+  const escaped = escapeHtml(text);
+  if (/[\u0D00-\u0D7F]/.test(text)) {
+    return `<span class="malayalam-text">${escaped}</span>`;
+  }
+  return escaped;
 }

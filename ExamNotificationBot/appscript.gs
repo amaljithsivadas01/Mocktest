@@ -45,6 +45,14 @@ var FORMS_CONFIG = {
     actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSeOEdoTYgQe0qZd8C6Ojs8ViRct-klN3ft5jpuHlVO-te0cAw/formResponse",
     nameEntry: "entry.582359518",
     batchEntry: "entry.167188585"
+  },
+  others: {
+    title: "NMMS MODEL TEST SERIES- 1",
+    department: "Department of Others",
+    actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLSclE-E1CdOD9-UNLPWGxQ8B4aRX8JCY5uVDOgL5jPH5QnIaIA/formResponse",
+    nameEntry: "entry.2010375593",
+    schoolEntry: "entry.2004239516",
+    mediumEntry: "entry.779557712"
   }
 };
 

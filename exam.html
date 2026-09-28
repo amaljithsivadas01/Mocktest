@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mock Exam | Page Learning</title>
   <meta name="description" content="Online Mock Test - Page Learning Custom Exam Portal" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wdth,wght@87.5,100..800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="logo.png" />
 </head>
@@ -124,6 +127,27 @@
           <label class="field-label" for="batch-input">BATCH / STREAM</label>
           <select id="batch-input" class="field-select">
             <option value="COMMERCE">COMMERCE</option>
+          </select>
+        </div>
+
+        <!-- Optional School Container (if present in Google Form) -->
+        <div class="form-field-group" id="school-field-container" style="display: none;">
+          <label class="field-label" for="school-input">SCHOOL</label>
+          <input
+            type="text"
+            id="school-input"
+            class="field-input"
+            placeholder="e.g. GHSS THRISSUR"
+            value="GHSS THRISSUR"
+          />
+        </div>
+
+        <!-- Optional Medium Container (if present in Google Form) -->
+        <div class="form-field-group" id="medium-field-container" style="display: none;">
+          <label class="field-label" for="medium-input">MEDIUM</label>
+          <select id="medium-input" class="field-select">
+            <option value="ENGLISH" selected>ENGLISH</option>
+            <option value="MALAYALAM">MALAYALAM</option>
           </select>
         </div>
 
