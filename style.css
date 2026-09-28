@@ -51,6 +51,7 @@ html {
 body {
   font-family: var(--font-family);
   font-optical-sizing: auto;
+  font-stretch: semi-condensed;
   font-variation-settings: "wdth" 87.5;
   background: var(--color-canvas);
   color: var(--color-text-main);
@@ -65,11 +66,19 @@ body {
 .anek-malayalam,
 .malayalam-text,
 :lang(ml) {
-  font-family: "Anek Malayalam", sans-serif;
+  font-family: var(--font-malayalam);
+  font-stretch: semi-condensed;
   font-optical-sizing: auto;
   font-style: normal;
-  font-variation-settings:
-    "wdth" 87.5;
+  font-weight: 400;
+  font-variation-settings: "wdth" 87.5, "wght" 400;
+}
+
+.question-text .malayalam-text,
+.option-text .malayalam-text {
+  font-weight: 400;
+  font-stretch: semi-condensed;
+  font-variation-settings: "wdth" 87.5, "wght" 400;
 }
 
 /* ===== DECORATIVE BACKGROUND ACCENTS ===== */
