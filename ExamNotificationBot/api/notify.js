@@ -278,7 +278,8 @@ function formatExamNotification(data) {
     `🏛️ <b>Department:</b> ${escapeHtml(data.department || 'General')}\n` +
     `🏆 <b>Final Marks:</b> <b>${marksDisplay} / ${maxMarksDisplay}</b> ${percentageDisplay}\n` +
     `⏱️ <b>Time Taken:</b> ${durationStr}\n` +
-    `🕒 <b>Submitted:</b> ${formatted}`
+    `🕒 <b>Submitted:</b> ${formatted}` +
+    (data.viewscoreUrl ? `\n\n🔗 <a href="${escapeHtml(data.viewscoreUrl)}">View Google Form Scorecard</a>` : '')
   );
 }
 

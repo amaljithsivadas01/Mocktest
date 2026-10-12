@@ -4,6 +4,7 @@ node_modules/
 .vercel/
 *.log
 test_form.html
-
 .vercel
 .env*
+scratch_*.js
+response.html

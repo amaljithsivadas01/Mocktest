@@ -45,8 +45,14 @@ async function loadExamQuestions(dept) {
 
     // Check Batch Field
     const batchContainer = document.getElementById('batch-field-container');
+    const batchSelect = document.getElementById('batch-input');
     if (batchContainer && examData.batchEntryId) {
       batchContainer.style.display = 'flex';
+      if (examData.batchOptions && examData.batchOptions.length > 0 && batchSelect) {
+        batchSelect.innerHTML = examData.batchOptions
+          .map(opt => `<option value="${escapeHtml(opt)}" ${opt.toUpperCase() === 'COMMERCE' ? 'selected' : ''}>${escapeHtml(opt)}</option>`)
+          .join('');
+      }
     }
 
     // Check School Field
@@ -57,8 +63,14 @@ async function loadExamQuestions(dept) {
 
     // Check Medium Field
     const mediumContainer = document.getElementById('medium-field-container');
+    const mediumSelect = document.getElementById('medium-input');
     if (mediumContainer && examData.mediumEntryId) {
       mediumContainer.style.display = 'flex';
+      if (examData.mediumOptions && examData.mediumOptions.length > 0 && mediumSelect) {
+        mediumSelect.innerHTML = examData.mediumOptions
+          .map(opt => `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`)
+          .join('');
+      }
     }
 
     // Render Questions
