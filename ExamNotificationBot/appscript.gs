@@ -53,6 +53,21 @@ var FORMS_CONFIG = {
     nameEntry: "entry.2010375593",
     schoolEntry: "entry.2004239516",
     mediumEntry: "entry.779557712"
+  },
+  uss: {
+    title: "EXAMS USS 2027",
+    department: "Department of Others",
+    actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLScRFOOWFaycc1Yk2pIy-htBGmWhF4_KjhIK8EggiHXoZ941Mg/formResponse",
+    nameEntry: "entry.1343261612",
+    schoolEntry: "entry.434375203",
+    mediumEntry: "entry.341672707"
+  },
+  activities: {
+    title: "Activity USS 2027",
+    department: "Activities",
+    actionUrl: "https://docs.google.com/forms/d/e/1FAIpQLScwgasfbZ5jiWxJPB9ZBL0Oi8aXB21HNxGsW4wMIXpQIFea3g/formResponse",
+    nameEntry: "entry.368965712",
+    schoolEntry: "entry.277112516"
   }
 };
 

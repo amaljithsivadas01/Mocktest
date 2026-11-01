@@ -72,13 +72,16 @@ body {
   font-style: normal;
   font-weight: 400;
   font-variation-settings: "wdth" 87.5, "wght" 400;
+  line-height: 1.6;
 }
 
 .question-text .malayalam-text,
 .option-text .malayalam-text {
+  font-family: var(--font-malayalam);
   font-weight: 400;
   font-stretch: semi-condensed;
   font-variation-settings: "wdth" 87.5, "wght" 400;
+  line-height: 1.6;
 }
 
 /* ===== DECORATIVE BACKGROUND ACCENTS ===== */

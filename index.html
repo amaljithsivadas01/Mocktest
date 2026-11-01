@@ -112,7 +112,18 @@
         <div class="dept-block">
           <div class="dept-title">OTHERS</div>
           <a href="exam.html?dept=others" class="dept-exam-btn" id="btn-others" data-dept="others">
-            NMMS MODEL TEST SERIES- 1
+            NMMS MODEL TEST SERIES- 3
+          </a>
+          <a href="exam.html?dept=uss" class="dept-exam-btn" id="btn-uss" data-dept="uss">
+            EXAMS USS 2027
+          </a>
+        </div>
+
+        <!-- Activities -->
+        <div class="dept-block">
+          <div class="dept-title">ACTIVITIES</div>
+          <a href="exam.html?dept=activities" class="dept-exam-btn" id="btn-activities" data-dept="activities">
+            Activity USS 2027
           </a>
         </div>
 
@@ -161,7 +172,7 @@
         const data = await res.json();
         if (!data.ok || !data.forms) return;
 
-        const depts = ['science', 'humanities', 'commerce', 'others'];
+        const depts = ['science', 'humanities', 'commerce', 'others', 'uss', 'activities'];
         depts.forEach(dept => {
           const btn = document.getElementById(`btn-${dept}`);
           const form = data.forms[dept];

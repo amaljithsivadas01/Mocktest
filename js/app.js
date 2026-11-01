@@ -309,6 +309,7 @@ async function handleFormSubmit(e) {
     showResultModal({
       studentName,
       department: result.department || examData.departmentName,
+      examTitle: result.examTitle || examData.title,
       marks: result.score.marksObtained,
       maxMarks: result.score.maxMarks,
       percentage: result.score.percentage,
@@ -334,6 +335,7 @@ function showResultModal(data) {
   if (!modal) return;
 
   const scoreNum = document.getElementById('modal-score-num');
+  const scoreMax = document.getElementById('modal-score-max');
   const studentName = document.getElementById('modal-student-name');
   const correctCount = document.getElementById('modal-correct-count');
   const percentage = document.getElementById('modal-percentage');
@@ -341,6 +343,7 @@ function showResultModal(data) {
   const deptLabel = document.getElementById('modal-dept-label');
 
   if (scoreNum) scoreNum.textContent = data.marks;
+  if (scoreMax) scoreMax.textContent = `/ ${data.maxMarks || 100}`;
   if (studentName) studentName.textContent = data.studentName;
   if (correctCount) correctCount.textContent = `${data.correctCount} / ${data.totalQuestions}`;
   if (percentage) percentage.textContent = `${data.percentage}%`;
@@ -349,7 +352,9 @@ function showResultModal(data) {
   const seconds = data.durationSeconds % 60;
   if (timeTaken) timeTaken.textContent = `${minutes}m ${seconds}s`;
 
-  if (deptLabel) deptLabel.textContent = `${data.department} Mock Test`;
+  if (deptLabel) {
+    deptLabel.textContent = data.examTitle ? `${data.examTitle} Mock Test` : `${data.department} Mock Test`;
+  }
 
   modal.classList.add('active');
 }
@@ -372,7 +377,7 @@ function formatQuestionText(text) {
   const formatted = lines.map(line => {
     const escaped = escapeHtml(line);
     if (/[\u0D00-\u0D7F]/.test(line)) {
-      return `<span class="malayalam-text">${escaped}</span>`;
+      return `<span class="malayalam-text" lang="ml">${escaped}</span>`;
     }
     return escaped;
   });
@@ -384,7 +389,7 @@ function formatOptionText(text) {
   if (!text) return '';
   const escaped = escapeHtml(text);
   if (/[\u0D00-\u0D7F]/.test(text)) {
-    return `<span class="malayalam-text">${escaped}</span>`;
+    return `<span class="malayalam-text" lang="ml">${escaped}</span>`;
   }
   return escaped;
 }
